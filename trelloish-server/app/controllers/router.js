@@ -1,5 +1,9 @@
 const express = require('express')
 const bodyParser = require('body-parser')
+const passport = require('passport');
+const jwt = require('jsonwebtoken');
+// const config = require('../config');
+const {basicStrategy, jwtStrategy} = require('./strategies');
 
 const router = express.Router();
 const jsonParser = bodyParser.json();
@@ -10,9 +14,10 @@ const CardsController = require('./cards')
 
 
 //BOARD ROUTES
-router.post('/boards', jsonParser, BoardsController.createBoard)
+router.get('/boards', [passport.authenticate('jwt', {session: false}), jsonParser, isLoggedIn], BoardsController.fetchBoards)
+// router.get('/boards', [jsonParser], BoardsController.fetchBoards)
 
-router.get('/boards', jsonParser, BoardsController.fetchBoards)
+router.post('/boards', jsonParser, BoardsController.createBoard)
 
 router.delete('/boards', jsonParser, BoardsController.deleteBoard)
 
@@ -37,4 +42,13 @@ router.delete('/cards', jsonParser, CardsController.deleteCard)
 
 router.put('/cards', jsonParser, CardsController.updateCard)
 
-module.exports = {router}
+
+// route middleware to ensure user is logged in
+function isLoggedIn(req, res, next) {
+    if (req.isAuthenticated())
+        return next();
+
+    res.redirect('/');
+}
+
+module.exports = {router, jwtStrategy, basicStrategy}

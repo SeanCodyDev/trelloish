@@ -13,6 +13,7 @@ const createBoard = (req, res) => {
 }
 
 const fetchBoards = (req, res) => {
+    console.log(req.user);
 
     Board
         .find()
