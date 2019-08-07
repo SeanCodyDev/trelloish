@@ -1,21 +1,35 @@
 const express = require('express')
 const bodyParser = require('body-parser')
 const passport = require('passport');
+//TODO: required???
 const jwt = require('jsonwebtoken');
 // const config = require('../config');
 const {basicStrategy, jwtStrategy} = require('./strategies');
 
 const router = express.Router();
+
 const jsonParser = bodyParser.json();
 
+const UsersController = require('./users')
 const BoardsController = require('./boards')
 const ListsController = require('./lists')
 const CardsController = require('./cards')
+const AuthController = require('./auth')
 
+// USER ROUTES
+// Register User
+router.post('/register', jsonParser, UsersController.register);
+
+//Login User
+router.post('/login', passport.authenticate('basic', {session: false}), AuthController.login);
+// router.post('/login', AuthController.login);
+
+//Refresh Token
+router.post('/refresh', passport.authenticate('jwt', {session: false}), AuthController.refresh);
 
 //BOARD ROUTES
-router.get('/boards', [passport.authenticate('jwt', {session: false}), jsonParser, isLoggedIn], BoardsController.fetchBoards)
-// router.get('/boards', [jsonParser], BoardsController.fetchBoards)
+// router.get('/boards', [passport.authenticate('jwt', {session: false}), jsonParser, isLoggedIn], BoardsController.fetchBoards)
+router.get('/boards', jsonParser, BoardsController.fetchBoards)
 
 router.post('/boards', jsonParser, BoardsController.createBoard)
 

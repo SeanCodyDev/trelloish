@@ -18,7 +18,7 @@ const fetchBoards = (req, res) => {
     Board
         .find()
         .then(boards => {
-            res.json(boards)
+            return res.json(boards)
         })
 }
 
